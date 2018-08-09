@@ -51,7 +51,7 @@ namespace ElevenNote.Services
 
         public NoteDetail GetNoteById(int noteID)
         {
-            using (var ctx = new ApplicationDbContext)
+            using (var ctx = new ApplicationDbContext())
             {
                 var entity = ctx.Notes.Single(e => e.NoteID == noteID && e.OwnerID == _userID);
                 return new NoteDetail
@@ -62,6 +62,20 @@ namespace ElevenNote.Services
                     CreatedUtc = entity.CreatedUtc,
                     MotifiedUtc = entity.MotifiedUtc
                 };
+            }
+        }
+
+        public bool UpdateNote(NoteEdit model)
+        {
+            using(var ctx = new ApplicationDbContext())
+            {
+                var entity = ctx.Notes.Single(e => e.NoteID == model.NoteID && e.OwnerID == _userID);
+
+                entity.Title = model.Title;
+                entity.Content = model.Content;
+                entity.MotifiedUtc = DateTimeOffset.UtcNow;
+
+                return ctx.SaveChanges() == 1;
             }
         }
     }
